@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Квартальный отчёт по рискам</title>
+<style>
+:root{
+  --navy:#0b2a4a; --navy2:#12395f; --blue:#1b5fa8; --blue-l:#e8f0fa;
+  --gold:#b8914a; --bg:#f2f4f8; --card:#fff; --line:#d9dfe8; --text:#1d2733; --muted:#5f6c7b;
+  --ok:#1f8a4c; --warn:#d98e04; --high:#d9622b; --crit:#c0392b; --low:#2e9e5b;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,Arial,sans-serif}
+header.top{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#d8b46e);display:grid;place-items:center;color:var(--navy);font-weight:800}
+.brand b{font-size:16px;letter-spacing:.3px}
+.brand small{display:block;color:#aebfd3;font-size:12px;margin-top:-2px}
+nav a{color:#cfdbea;text-decoration:none;margin-left:26px;font-size:14px;padding:22px 0;display:inline-block;border-bottom:3px solid transparent}
+nav a:hover,nav a.active{color:#fff;border-bottom-color:var(--gold)}
+
+.hero{background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 60%,#1b4d7e 100%);color:#fff;padding:56px 0 90px}
+.hero .wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:48px;align-items:center}
+.hero h1{font-size:34px;line-height:1.2;margin:0 0 14px;font-weight:700}
+.hero p{color:#d3dfee;font-size:16px;margin:0 0 24px;max-width:640px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:6px;padding:12px 22px;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;transition:.15s}
+.btn.gold{background:var(--gold);color:#fff}.btn.gold:hover{background:#a37f3d}
+.btn.primary{background:var(--blue);color:#fff}.btn.primary:hover{background:#154f8e}
+.btn.ghost{background:#fff;color:var(--blue);border:1px solid var(--blue)}.btn.ghost:hover{background:var(--blue-l)}
+.btn.sm{padding:7px 14px;font-size:13px}
+.btn.danger{background:#fff;color:var(--crit);border:1px solid #e3b5af}.btn.danger:hover{background:#fbeceb}
+.facts{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:22px 24px}
+.facts div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.14);font-size:14px}
+.facts div:last-child{border:0}.facts span{color:#aebfd3}.facts b{text-align:right}
+
+.cards{margin-top:-52px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.info{background:var(--card);border-radius:10px;padding:24px;box-shadow:0 4px 14px rgba(11,42,74,.08);border-top:4px solid var(--gold)}
+.info .n{width:34px;height:34px;border-radius:50%;background:var(--blue-l);color:var(--blue);display:grid;place-items:center;font-weight:700;margin-bottom:12px}
+.info h3{margin:0 0 6px;font-size:17px;color:var(--navy)}
+.info p{margin:0;color:var(--muted);font-size:14px}
+
+section.block{padding:56px 0 20px}
+h2.title{font-size:26px;color:var(--navy);margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 26px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px rgba(11,42,74,.05);margin-bottom:22px}
+.panel>.ph{padding:16px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.panel>.ph h3{margin:0;font-size:17px;color:var(--navy)}
+.panel>.pb{padding:22px 24px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px 18px}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}.c12{grid-column:span 12}.c2{grid-column:span 2}
+label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:5px}
+label i{color:var(--crit);font-style:normal}
+input,select,textarea{width:100%;border:1px solid #c4ccd8;border-radius:6px;padding:9px 11px;font:inherit;color:var(--text);background:#fff;transition:.15s}
+textarea{resize:vertical;min-height:70px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,95,168,.15)}
+.invalid{border-color:var(--crit)!important;background:#fff6f5}
+.hint{font-size:12px;color:var(--muted);margin-top:4px}
+
+.risk{border:1px solid var(--line);border-radius:10px;margin-bottom:18px;background:#fff;overflow:hidden}
+.risk-h{background:#f7f9fc;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);cursor:pointer}
+.risk-h .l{display:flex;align-items:center;gap:12px;min-width:0}
+.risk-num{background:var(--navy);color:#fff;border-radius:6px;padding:2px 10px;font-weight:700;font-size:13px}
+.risk-t{font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:560px}
+.badge{display:inline-block;border-radius:20px;padding:2px 12px;font-size:12px;font-weight:700;color:#fff;background:#9aa6b5}
+.lv-1{background:var(--low)}.lv-2{background:var(--warn)}.lv-3{background:var(--high)}.lv-4{background:var(--crit)}
+.risk-b{padding:20px}
+.risk.collapsed .risk-b{display:none}
+.sect{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);font-weight:700;margin:4px 0 -2px;grid-column:span 12;border-bottom:1px dashed var(--line);padding-bottom:4px}
+.level-box{border:1px solid var(--line);border-radius:6px;padding:9px 11px;background:#f7f9fc;font-weight:700;text-align:center}
+.range{display:flex;align-items:center;gap:8px}.range span{font-weight:700;color:var(--blue);width:18px;text-align:center}
+.hidden{display:none!important}
+
+.bar{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(11,42,74,.08);z-index:15}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px}
+.stat{color:var(--muted);font-size:14px}.stat b{color:var(--navy)}
+.saved{font-size:12px;color:var(--ok);margin-left:10px}
+footer{background:var(--navy);color:#aebfd3;padding:22px 0;font-size:13px;margin-top:40px}
+
+.overlay{position:fixed;inset:0;background:rgba(11,42,74,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:12px;max-width:640px;width:100%;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 6px;color:var(--navy);font-size:22px}
+.sumtab{width:100%;border-collapse:collapse;margin:16px 0 20px;font-size:14px}
+.sumtab td{padding:8px 4px;border-bottom:1px solid var(--line)}.sumtab td:last-child{text-align:right;font-weight:700}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.toast{position:fixed;top:78px;right:24px;background:var(--navy);color:#fff;padding:12px 20px;border-radius:8px;z-index:60;display:none;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+@media (max-width:980px){
+  .hero .wrap{grid-template-columns:1fr}.cards{grid-template-columns:1fr}
+  .c3,.c4,.c6,.c8,.c2{grid-column:span 6}
+  nav{display:none}
+}
+@media print{header.top,.bar,.hero,.cards,footer{display:none}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">R</div>
+      <div><b>Управление рисками</b><small>Портал сбора данных для Наблюдательного совета</small></div>
+    </div>
+    <nav>
+      <a href="#welcome" class="active" data-nav>Приветствие</a>
+      <a href="#fill" data-nav>Заполнение данных</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= БЛОК 1: ПРИВЕТСТВИЕ ================= -->
+<section id="welcome">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Квартальный отчёт по рискам: предоставление данных руководителями структурных подразделений</h1>
+        <p>Уважаемые коллеги! Форма предназначена для сбора актуальных сведений о состоянии рисков, утверждённых в регистре рисков Общества. На основании ваших данных будет сформирован сводный отчёт для Наблюдательного совета.</p>
+        <a href="#fill" class="btn gold">Перейти к заполнению →</a>
+      </div>
+      <div class="facts">
+        <div><span>Периодичность</span><b>Ежеквартально</b></div>
+        <div><span>Кто заполняет</span><b>Руководитель структурного подразделения</b></div>
+        <div><span>Основа отчёта</span><b>Регистр рисков (утверждённый)</b></div>
+        <div><span>Получатель</span><b>Процессное управление и ВКР</b></div>
+        <div><span>Срок предоставления</span><b>до <span id="deadline">—</span></b></div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="cards">
+      <div class="info"><div class="n">1</div><h3>Укажите данные подразделения</h3><p>Отчётный период, наименование подразделения и контактные данные ответственного руководителя.</p></div>
+      <div class="info"><div class="n">2</div><h3>Заполните карточки рисков</h3><p>По каждому риску вашего подразделения из регистра: оценка, динамика, факт реализации, меры управления.</p></div>
+      <div class="info"><div class="n">3</div><h3>Сформируйте и направьте файл</h3><p>Нажмите «Завершить и сформировать отчёт», скачайте файл и направьте его в отдел процессного управления и ВКР.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= БЛОК 2: ЗАПОЛНЕНИЕ ================= -->
+<section id="fill" class="block">
+  <div class="wrap">
+    <h2 class="title">Заполнение данных по рискам</h2>
+    <p class="sub">Поля, отмеченные <span style="color:var(--crit)">*</span>, обязательны. Введённые данные автоматически сохраняются в вашем браузере.</p>
+
+    <div class="panel">
+      <div class="ph"><h3>1. Общие сведения</h3></div>
+      <div class="pb"><div class="grid">
+        <div class="c3"><label>Отчётный квартал <i>*</i></label>
+          <select id="quarter" data-req><option value="1">I квартал</option><option value="2">II квартал</option><option value="3">III квартал</option><option value="4">IV квартал</option></select></div>
+        <div class="c3"><label>Год <i>*</i></label><select id="year" data-req></select></div>
+        <div class="c6"><label>Структурное подразделение <i>*</i></label>
+          <input id="dept" list="deptList" data-req placeholder="Выберите или введите наименование">
+          <datalist id="deptList"></datalist></div>
+        <div class="c6"><label>ФИО руководителя <i>*</i></label><input id="fio" data-req placeholder="Фамилия Имя Отчество"></div>
+        <div class="c3"><label>Должность <i>*</i></label><input id="post" data-req></div>
+        <div class="c3"><label>E-mail / телефон</label><input id="contact"></div>
+      </div></div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><h3>2. Риски подразделения (согласно регистру рисков)</h3>
+        <div class="actions"><button class="btn ghost sm" id="toggleAll" type="button">Свернуть / развернуть все</button><button class="btn primary sm" id="addRisk" type="button">+ Добавить риск</button></div></div>
+      <div class="pb">
+        <div id="risks"></div>
+        <div class="hint">Добавьте карточку по каждому риску из регистра, закреплённому за вашим подразделением. Уровень риска рассчитывается автоматически: вероятность × влияние.</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><h3>3. Новые риски и общие комментарии</h3></div>
+      <div class="pb"><div class="grid">
+        <div class="c12"><label>Предлагаемые к включению в регистр новые риски</label>
+          <textarea id="newRisks" placeholder="Наименование и краткое описание риска, причины, возможные последствия (необязательно)"></textarea></div>
+        <div class="c12"><label>Общие комментарии</label><textarea id="comments"></textarea></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="stat">Рисков заполнено: <b id="cntDone">0</b> из <b id="cntAll">0</b><span class="saved" id="saved"></span></div>
+    <div class="actions">
+      <button class="btn danger sm" id="reset" type="button">Очистить форму</button>
+      <button class="btn primary" id="submit" type="button">Завершить и сформировать отчёт</button>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">Отдел процессного управления и внутреннего контроля и рисков · Данные формируются локально в вашем браузере</div></footer>
+
+<div class="overlay" id="modal"><div class="modal">
+  <h3>Отчёт сформирован</h3>
+  <div class="hint" id="mSub"></div>
+  <table class="sumtab" id="mTab"></table>
+  <p style="margin:0 0 14px;color:var(--muted);font-size:14px">Скачайте файл и направьте его в отдел процессного управления и ВКР (кнопка «Отправить по e-mail» откроет письмо — приложите скачанный файл).</p>
+  <div class="actions">
+    <button class="btn primary" id="dlCsv" type="button">⬇ Скачать Excel (CSV)</button>
+    <button class="btn ghost" id="dlJson" type="button">⬇ JSON</button>
+    <button class="btn ghost" id="mail" type="button">✉ Отправить по e-mail</button>
+    <button class="btn ghost" id="print" type="button">🖶 Печать</button>
+    <button class="btn ghost" id="closeM" type="button">Закрыть</button>
+  </div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== НАСТРОЙКИ (при необходимости измените) ===== */
+const CONFIG = {
+  email: 'risk@company.kz',                 // адрес отдела процессного управления и ВКР
+  deadlineDays: 10,                         // срок предоставления: дней после окончания квартала
+  departments: [
+    'Департамент финансов','Департамент закупок','Департамент информационных технологий',
+    'Департамент по работе с персоналом','Юридический департамент','Департамент производства',
+    'Департамент безопасности','Департамент стратегии и развития','Административный департамент'
+  ],
+  categories: ['Стратегический','Операционный','Финансовый','Правовой / комплаенс','Информационная безопасность / ИТ','Кадровый','Репутационный','Прочий'],
+  storageKey: 'risk_report_form_v1'
+};
+
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const QN = {1:'I',2:'II',3:'III',4:'IV'};
+const LEVELS = [{t:'Низкий',c:'lv-1'},{t:'Средний',c:'lv-2'},{t:'Высокий',c:'lv-3'},{t:'Критический',c:'lv-4'}];
+function levelOf(p,i){const s=p*i; return {s, ...LEVELS[s<=4?0:s<=9?1:s<=15?2:3]};}
+let uid = 0;
+
+/* ===== инициализация справочников ===== */
+(function init(){
+  const now = new Date(), y = now.getFullYear(), curQ = Math.floor(now.getMonth()/3)+1;
+  for(let k=y-1;k<=y+1;k++) $('#year').add(new Option(k,k));
+  let q = curQ-1, yy = y; if(q<1){q=4;yy=y-1;}          // по умолчанию — последний завершённый квартал
+  $('#quarter').value=q; $('#year').value=yy;
+  CONFIG.departments.forEach(d=>{const o=document.createElement('option');o.value=d;$('#deptList').appendChild(o);});
+  updateDeadline();
+})();
+
+function updateDeadline(){
+  const q=+$('#quarter').value, y=+$('#year').value;
+  const end = new Date(y, q*3, 0);                       // последний день квартала
+  end.setDate(end.getDate()+CONFIG.deadlineDays);
+  $('#deadline').textContent = end.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
+}
+
+/* ===== карточка риска ===== */
+function riskHTML(n){
+  const cat = CONFIG.categories.map(c=>`<option>${c}</option>`).join('');
+  const scale = [1,2,3,4,5].map(v=>`<option value="${v}">${v}</option>`).join('');
+  return `
+  <div class="risk-h" data-toggle>
+    <div class="l"><span class="risk-num">Риск №<span class="idx">${n}</span></span><span class="risk-t">Новый риск</span></div>
+    <div class="actions"><span class="badge lvbadge">Не оценён</span>
+      <button class="btn danger sm" type="button" data-del>Удалить</button></div>
+  </div>
+  <div class="risk-b"><div class="grid">
+    <div class="sect">Идентификация (по регистру рисков)</div>
+    <div class="c3"><label>Код риска в регистре <i>*</i></label><input data-f="code" data-req placeholder="напр., R-014"></div>
+    <div class="c6"><label>Наименование риска <i>*</i></label><input data-f="name" data-req></div>
+    <div class="c3"><label>Категория риска</label><select data-f="category">${cat}</select></div>
+
+    <div class="sect">Оценка и динамика</div>
+    <div class="c2"><label>Вероятность (1–5) <i>*</i></label><select data-f="prob" data-req><option value="">—</option>${scale}</select></div>
+    <div class="c2"><label>Влияние (1–5) <i>*</i></label><select data-f="impact" data-req><option value="">—</option>${scale}</select></div>
+    <div class="c2"><label>Уровень риска</label><div class="level-box" data-level>—</div></div>
+    <div class="c3"><label>Динамика к прошлому кварталу <i>*</i></label>
+      <select data-f="trend" data-req><option value="">—</option><option>Снизился</option><option>Без изменений</option><option>Вырос</option></select></div>
+    <div class="c3"><label>Риск реализовался в квартале? <i>*</i></label>
+      <select data-f="realized" data-req><option value="">—</option><option>Нет</option><option>Да</option></select></div>
+
+    <div class="c3 rz hidden"><label>Дата реализации</label><input type="date" data-f="rdate"></div>
+    <div class="c3 rz hidden"><label>Фактический ущерб, тыс. тенге</label><input type="number" min="0" step="any" data-f="damage"></div>
+    <div class="c6 rz hidden"><label>Описание события и причины</label><input data-f="rdesc"></div>
+
+    <div class="sect">Меры управления риском</div>
+    <div class="c3"><label>Статус выполнения мероприятий <i>*</i></label>
+      <select data-f="mstatus" data-req><option value="">—</option><option>Выполнены</option><option>В работе</option><option>Не начаты</option><option>Просрочены</option><option>Не требуются</option></select></div>
+    <div class="c2"><label>Исполнение, %</label><input type="number" min="0" max="100" data-f="percent"></div>
+    <div class="c3"><label>Срок исполнения</label><input type="date" data-f="mdue"></div>
+    <div class="c4"><label>Ответственный исполнитель</label><input data-f="owner"></div>
+    <div class="c6"><label>Реализованные / планируемые мероприятия</label><textarea data-f="measures"></textarea></div>
+    <div class="c6"><label>Комментарий (проблемы, потребность в поддержке)</label><textarea data-f="comment"></textarea></div>
+  </div></div>`;
+}
+
+function addRisk(data){
+  const n = $$('.risk').length+1;
+  const el = document.createElement('div');
+  el.className='risk'; el.id='r'+(++uid);
+  el.innerHTML = riskHTML(n);
+  $('#risks').appendChild(el);
+  if(data){ $$('[data-f]',el).forEach(f=>{ if(data[f.dataset.f]!==undefined) f.value=data[f.dataset.f]; }); }
+  refreshRisk(el);
+  return el;
+}
+
+function refreshRisk(el){
+  const p=+$('[data-f=prob]',el).value, i=+$('[data-f=impact]',el).value;
+  const lb=$('.lvbadge',el), lv=$('[data-level]',el);
+  lb.className='badge lvbadge'; lv.className='level-box';
+  if(p&&i){const L=levelOf(p,i); lb.textContent=L.t+' ('+L.s+')'; lb.classList.add(L.c); lv.textContent=L.t+' · '+L.s;}
+  else{lb.textContent='Не оценён'; lv.textContent='—';}
+  $$('.rz',el).forEach(x=>x.classList.toggle('hidden', $('[data-f=realized]',el).value!=='Да'));
+  const code=$('[data-f=code]',el).value.trim(), name=$('[data-f=name]',el).value.trim();
+  $('.risk-t',el).textContent = (code?code+' — ':'')+(name||'Новый риск');
+}
+
+function renumber(){ $$('.risk').forEach((r,k)=>$('.idx',r).textContent=k+1); }
+
+function riskComplete(el){ return $$('[data-req]',el).every(f=>f.value.trim()!==''); }
+function updateStats(){
+  const all=$$('.risk'); $('#cntAll').textContent=all.length;
+  $('#cntDone').textContent=all.filter(riskComplete).length;
+}
+
+/* ===== сохранение черновика ===== */
+function collect(){
+  return {
+    quarter:$('#quarter').value, year:$('#year').value, dept:$('#dept').value.trim(),
+    fio:$('#fio').value.trim(), post:$('#post').value.trim(), contact:$('#contact').value.trim(),
+    newRisks:$('#newRisks').value.trim(), comments:$('#comments').value.trim(),
+    risks:$$('.risk').map(r=>{const o={}; $$('[data-f]',r).forEach(f=>o[f.dataset.f]=f.value.trim()); return o;})
+  };
+}
+function save(){
+  try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify(collect()));
+    $('#saved').textContent='✓ черновик сохранён '+new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); }catch(e){}
+}
+function restore(){
+  let d=null; try{ d=JSON.parse(localStorage.getItem(CONFIG.storageKey)||'null'); }catch(e){}
+  if(d){
+    ['quarter','year','dept','fio','post','contact','newRisks','comments'].forEach(k=>{ if(d[k]) $('#'+k).value=d[k]; });
+    (d.risks||[]).forEach(r=>addRisk(r));
+  }
+  if(!$$('.risk').length) addRisk();
+  updateDeadline(); updateStats();
+}
+
+/* ===== события ===== */
+document.addEventListener('input',e=>{
+  e.target.classList.remove('invalid');
+  const r=e.target.closest('.risk'); if(r) refreshRisk(r);
+  if(e.target.id==='quarter'||e.target.id==='year') updateDeadline();
+  updateStats(); save();
+});
+document.addEventListener('click',e=>{
+  const del=e.target.closest('[data-del]');
+  if(del){ e.stopPropagation(); const r=del.closest('.risk');
+    if($$('.risk').length===1){ toast('Должна остаться хотя бы одна карточка риска'); return; }
+    if(confirm('Удалить эту карточку риска?')){ r.remove(); renumber(); updateStats(); save(); } return; }
+  const h=e.target.closest('[data-toggle]'); if(h) h.parentElement.classList.toggle('collapsed');
+});
+$('#addRisk').onclick=()=>{ const r=addRisk(); updateStats(); r.scrollIntoView({behavior:'smooth',block:'center'}); $('[data-f=code]',r).focus(); };
+$('#toggleAll').onclick=()=>{ const rs=$$('.risk'); const collapse=rs.some(r=>!r.classList.contains('collapsed')); rs.forEach(r=>r.classList.toggle('collapsed',collapse)); };
+$('#reset').onclick=()=>{ if(!confirm('Очистить все введённые данные?')) return;
+  try{localStorage.removeItem(CONFIG.storageKey);}catch(e){} location.reload(); };
+
+/* навигация: подсветка */
+const secs=[['welcome','#welcome'],['fill','#fill']];
+addEventListener('scroll',()=>{
+  const y=scrollY+120; let cur='welcome';
+  secs.forEach(([id])=>{ if($('#'+id).offsetTop<=y) cur=id; });
+  $$('[data-nav]').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+});
+
+/* ===== проверка и формирование отчёта ===== */
+let lastData=null;
+$('#submit').onclick=()=>{
+  $$('.invalid').forEach(x=>x.classList.remove('invalid'));
+  let first=null;
+  $$('[data-req]').forEach(f=>{ if(!f.value.trim()){ f.classList.add('invalid'); const r=f.closest('.risk'); if(r) r.classList.remove('collapsed'); if(!first) first=f; } });
+  if(first){ toast('Заполните обязательные поля, отмеченные красным'); first.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  lastData=collect(); lastData.submitted=new Date().toISOString();
+  const cnt=[0,0,0,0], real=lastData.risks.filter(r=>r.realized==='Да').length;
+  lastData.risks.forEach(r=>{ const L=levelOf(+r.prob,+r.impact); cnt[LEVELS.findIndex(x=>x.t===L.t)]++; });
+  $('#mSub').textContent=`${lastData.dept} · ${QN[lastData.quarter]} квартал ${lastData.year} · ${lastData.fio}`;
+  $('#mTab').innerHTML=`<tr><td>Всего рисков в отчёте</td><td>${lastData.risks.length}</td></tr>`+
+    LEVELS.map((L,k)=>`<tr><td><span class="badge ${L.c}">${L.t}</span></td><td>${cnt[k]}</td></tr>`).join('')+
+    `<tr><td>Реализовалось в квартале</td><td>${real}</td></tr>`;
+  $('#modal').classList.add('show');
+};
+$('#closeM').onclick=()=>$('#modal').classList.remove('show');
+$('#print').onclick=()=>window.print();
+
+function fname(ext){ const s=(lastData.dept||'dept').replace(/[^\wа-яё]+/gi,'_'); return `Риски_${lastData.year}_Q${lastData.quarter}_${s}.${ext}`; }
+function download(name,text,type){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type}));
+  a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+$('#dlJson').onclick=()=>download(fname('json'),JSON.stringify(lastData,null,2),'application/json');
+$('#dlCsv').onclick=()=>{
+  const H=['Год','Квартал','Подразделение','Руководитель','Должность','Контакты','Код риска','Наименование риска','Категория',
+    'Вероятность','Влияние','Балл','Уровень риска','Динамика','Реализовался','Дата реализации','Ущерб, тыс. тенге','Описание реализации',
+    'Статус мероприятий','Исполнение, %','Срок исполнения','Ответственный','Мероприятия','Комментарий','Предложения по новым рискам','Общие комментарии','Дата заполнения'];
+  const d=lastData, esc=v=>'"'+String(v??'').replace(/"/g,'""').replace(/\r?\n/g,' ')+'"';
+  const rows=d.risks.map(r=>{ const L=levelOf(+r.prob,+r.impact);
+    return [d.year,QN[d.quarter],d.dept,d.fio,d.post,d.contact,r.code,r.name,r.category,r.prob,r.impact,L.s,L.t,r.trend,r.realized,
+      r.rdate,r.damage,r.rdesc,r.mstatus,r.percent,r.mdue,r.owner,r.measures,r.comment,d.newRisks,d.comments,new Date(d.submitted).toLocaleString('ru-RU')].map(esc).join(';'); });
+  download(fname('csv'),'\uFEFF'+H.map(esc).join(';')+'\r\n'+rows.join('\r\n'),'text/csv;charset=utf-8');
+};
+$('#mail').onclick=()=>{
+  const d=lastData, subj=`Отчёт по рискам: ${d.dept}, ${QN[d.quarter]} кв. ${d.year}`;
+  const body=`Добрый день!\n\nНаправляю данные по рискам подразделения «${d.dept}» за ${QN[d.quarter]} квартал ${d.year}.\nРисков в отчёте: ${d.risks.length}.\nФайл отчёта во вложении.\n\n${d.fio}\n${d.post}`;
+  location.href=`mailto:${CONFIG.email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+};
+
+let tt; function toast(m){ const t=$('#toast'); t.textContent=m; t.style.display='block'; clearTimeout(tt); tt=setTimeout(()=>t.style.display='none',3200); }
+
+restore();
+</script>
+</body>
+</html>
